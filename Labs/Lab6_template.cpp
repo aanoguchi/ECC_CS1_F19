@@ -54,7 +54,7 @@ Space c_to_space(char c);
 Row s_to_row(std::string s);
 Board s_to_board(std::string s);
 
-//// Printers
+//// Convert data types to string format
 void test_space_to_s();
 string space_to_s(Space s);
 void test_row_to_s();
@@ -62,7 +62,7 @@ string row_to_s(Row r);
 void test_board_to_s();
 string board_to_s(Board b);
 
-//// Interface
+//// Interface message generators
 void test_gamestate_message();
 string gamestate_message(Board b, Space turn);
 void test_end_game_message();

@@ -1,104 +1,102 @@
 /**
- * Instructions:
- * Implement the code, and write comments described in the
- * //TODO:
- * formatted comments.
- *
- * //NOTE:
- * comments clarify parts of the given code.
- *
- * //IGNORE:
- * comments mark code which can be safely ignored.
+ * Instructions: *Using the design recipie*,
+ * implement the missing code by following the TODO tags.
+ **/
+
+/**
+ * Tic-Tac-Toe
  *
  * Allows a user to play a game of tic tac toe in the terminal against a
  * computer.
  *
  **/
 
-//TODO: Insert your header
-//NOTE: Your header no longer needs to include inputs and outputs
-#include <iostream>
-#include <cassert>
 #include <string>
+#include <vector>
+#include <cassert>
+#include <iostream>
 
 using namespace std;
-
 /**
- * Data Definitions
+ * Data definitions
  **/
 
+// A Location represents the index of a space on a tic-tac-toe board in the
+// following configuration:
+// 0|1|2
+// -+-+-
+// 3|4|5
+// -+-+-
+// 6|7|8
 using Location = int;
 
-enum class Player {One, Two};
-
+// A Space represents the possible values within one space on the tic-tac-toe
+// board.
 enum class Space {Empty, X, O};
-using namespace Space;
+
+
+// A Row represents one row of 3 spaces on the tic-tac-toe board
 struct Row {
   Space left, center, right;
 };
+const Row BLANK_ROW = { Space::Empty, Space::Empty, Space::Empty };
+// A Board consists of 3 rows of spaces
 struct Board {
   Row top, middle, bottom;
 };
+const Board BLANK_BOARD = { BLANK_ROW, BLANK_ROW, BLANK_ROW };
 /**
- * Function Declarations
+ * Functions
  **/
 
-// START TODO
-/**
- * TODO Use the design recipie to implement the to_s
- * functions
- * Example string format
- * x | o |
- *---+---+---
- * o | x |
- *---+---+---
- *   |   |o
- */
-string board_to_s(Board b);
-string row_to_s(Row r);
+//// Initializers
+Space c_to_space(char c);
+Row s_to_row(std::string s);
+Board s_to_board(std::string s);
+
+//// Convert data types to string format
+void test_space_to_s();
 string space_to_s(Space s);
+void test_row_to_s();
+string row_to_s(Row r);
+void test_board_to_s();
+string board_to_s(Board b);
 
-string player_to_s(Player p);
+//// Interface message generators
+void test_gamestate_message();
+string gamestate_message(Board b, Space turn);
+void test_end_game_message();
+string end_game_message(Board b, Space win);
 
-// Report winner
-// AI
-// TODO Using the complete design recipie implement an AI which chooses the next
-// location to play given the current state of the board.
-Location compute_move(Board b);
+//// Get moves
+Location get_move(Board b, Space turn);
+Location compute_move(Board b, Space turn);
 
-// TODO Generate an end of game message to send to the user.
-string end_game_message(Board b, Player winner);
-// END TODO
-
-
-
-// NOTE Use these functions to implement compute_move
-// Turns
-Player next_turn(Player current_turn);
-// Validate moves
-bool is_valid(Board b, Player turn, Location move);
+//// Getters
 Space get_space(Board b, Location l);
-// Interface
-//// Select a location
-Location get_move();
-//// Print out gamestate
-void print_gamestate(Board b);
+Space get_space(Row b, Location l);
 
-//// Detect win condition
+//// Setters
+Board set_space(Board b, Location l, Space s);
+Row set_space(Row r, Location l, Space s);
+
+
+//// Game mechanics
+bool full(Board b);
+bool full(Row r);
+bool full(Space s);
+
+vector<Row> flay(Board b);
+vector<Row> flay_rows(Board b);
+vector<Row> flay_cols(Board b);
+vector<Row> flay_diags(Board b);
+
+Space winner(Board b);
+Space winner(Row r);
+
 bool is_game_over(Board b);
-Player next_turn(Player current_turn);
-Space get_space_from_row(Row r, Location l);
-Space get_space(Board b, Location l);
-Board set_space(Board b, Player p, Location l);
-
-/**
- * V1 features
- **/
-// Scoreboard
-// Exit game
-
-
-//IGNORE: You can ignore these functions
+Space next_turn(Space t);
+//// Template Functions
 void test();
 void run();
 void run_game();
@@ -119,15 +117,6 @@ int main() {
   }
   return 0;
 }
-
-/**
- * Function Definitions
- **/
-
-void test() {
-  //TODO Make sure to run your test functions!
-}
-
 void run() {
   // Variable Declarations
   char again = 'y';
@@ -137,70 +126,233 @@ void run() {
     cin >> again;
   }
 }
+void test() {
+  // TODO Implement these!
+  test_space_to_s();
+  test_row_to_s();
+  test_board_to_s();
+  test_gamestate_message();
+  test_end_game_message();
+ }
 void run_game() {
-  Board board = {{Empty, Empty, Empty},
-                 {Empty, Empty, Empty},
-                 {Empty, Empty, Empty}};
-  Player winner;
-  Player turn = Player::One;
-  while(!is_game_over(board)) {
-    print_gamestate(board);
-    board = set_space(b,turn,get_move());
+  // Initial game state with blank board and player one first.
+  Board b = BLANK_BOARD;
+  Space turn = Space::O;
+  Location move;
+
+  while(!is_game_over(b)) {
+    // Human player
+    if(turn == Space::O) {
+      // Show player the board
+      cout << gamestate_message(b, turn) << endl;
+      move = get_move(b, turn);
+    // Computer
+    } else {
+      move = compute_move(b, turn);
+    }
+    b = set_space(b,move,turn);
     turn = next_turn(turn);
   }
-  cout << end_game_message(board, winner) << endl;
-}
-Board set_space(Board b, Player p, Location l) {
-  return b;
-}
-string row_to_s(Row r) {
-  return "";
-}
-string board_to_s(Board b) {
-  return row_to_s(b.top) + "\n" +
-         row_to_s(b.middle) + "\n" +
-         row_to_s(b.bottom)  + "\n";
+  cout << end_game_message(b, winner(b)) << endl;
+  return;
 }
 
-Player next_turn(Player current_turn) {
-  Player next_player;
-  if(current_turn == Player::One) {
-    next_player = Player::Two;
-  } else if(current_turn == Player::Two) {
-    next_player = Player::One;
+
+
+
+//// Printers
+/*TODO*/
+
+string space_to_s(Space s) {
+  if(s == Space::Empty) {
+    return " ";
+  } else if(s == Space::X) {
+    return "x";
+  } else {
+    return "o";
   }
-  return next_player;
 }
-Space get_space_from_row(Row r, Location l) {
-  return Empty;
+/*TODO*/
+string row_to_s(Row r) {
+  return space_to_s(r.left) +
+    space_to_s(r.center) +
+    space_to_s(r.right);
 }
+/*TODO*/
+string board_to_s(Board b) {
+  return row_to_s(b.top) +
+    row_to_s(b.middle) +
+    row_to_s(b.bottom);
+}
+
+/*TODO*/
+// Input
+//// Space win - who was the winner? `Empty` means it's a cat's game
+string end_game_message(Board b, Space win) {
+  return "Game Over";
+}
+/*TODO*/
+string gamestate_message(Board b, Space turn){
+  return "This is what the board looks like: ";
+}
+
+//// Get moves
+/*TODO*/
+Location get_move(Board b, Space turn) {
+  Location l = 0;
+  cin >> l;
+  return l;
+}
+/*TODO*/
+Location compute_move(Board b, Space turn) {
+  return 0;
+}
+
+
+/**
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ * Don't worry too much about this stuff down here
+ *
+ **/
+
+//// Initializers
+Space c_to_space(char c) {
+  if(c == ' ') {
+    return Space::Empty;
+  } else if(c == 'x') {
+    return Space::X;
+  } else {
+    return Space::O;
+  }
+}
+Row s_to_row(string s) {
+  return { c_to_space(s[0]),
+           c_to_space(s[1]),
+           c_to_space(s[2]) };
+}
+Board s_to_board(string s) {
+  return { s_to_row(s.substr(0,3)),
+           s_to_row(s.substr(3,3)),
+           s_to_row(s.substr(6,3)) };
+}
+
+//// Getters
 Space get_space(Board b, Location l) {
   int row = l / 3;
   Space result;
   if(row == 0) {
-    result = get_space_from_row(b.top, l);
+    result = get_space(b.top, l);
   } else if(row == 1) {
-    result = get_space_from_row(b.middle, l);
+    result = get_space(b.middle, l);
   } else {
-    result = get_space_from_row(b.bottom, l);
+    result = get_space(b.bottom, l);
   }
   return result;
 }
- bool is_game_over(Board b) {
-   return true;
- }
-bool is_valid(Board b, Player turn, Location move) {
-  return true;
+Space get_space(Row r, Location l) {
+  int col = l % 3;
+  Space result;
+  if(col == 0) {
+    result = r.left;
+  } else if(col == 1) {
+    result = r.center;
+  } else {
+    result = r.right;
+  }
+  return result;
 }
-Space get_space(Board b, Location l) {
-  return b.top.left;
+
+//// Setters
+Board set_space(Board b, Location l, Space s){
+    int row = l / 3;
+    if(row == 0) {
+      b.top = set_space(b.top, l, s);
+    } else if(row == 1) {
+      b.middle =  set_space(b.middle, l, s);
+    } else {
+      b.bottom = set_space(b.bottom, l, s);
+    }
+    return b;
 }
-// Interface
-//// Select a location
-Location get_move(Board b) {
-  return 0;
+Row set_space(Row r, Location l, Space s){
+    int col = l % 3;
+    Row result = r;
+    if(col == 0) {
+      result.left = s;
+    } else if(col == 1) {
+      result.center = s;
+    } else {
+      result.right = s;
+    }
+    return result;
 }
-//// Print out gamestate
-void print_gamestate(Board b) {
-  cout << board_to_s(b) << endl;
+
+
+//// Game mechanics
+bool full(Board b){
+  return full(b.top) && full(b.middle) && full(b.bottom);
+}
+bool full(Row r) {
+  return full(r.left) && full(r.center) && full(r.right);
+}
+bool full(Space s) {
+  return s != Space::Empty;
+}
+
+// Get every row, col, and diagonal as a vector
+vector<Row> flay(Board b) {
+  vector<Row> v(8);
+  vector<Row> s = flay_rows(b);
+  v.insert(v.end(), s.begin(), s.end());
+  s = flay_cols(b);
+  v.insert(v.end(), s.begin(), s.end());
+  s = flay_diags(b);
+  v.insert(v.end(), s.begin(), s.end());
+  return v;
+}
+vector<Row> flay_rows(Board b) {
+  return { b.top, b.middle, b.bottom };
+}
+vector<Row> flay_cols(Board b) {
+  return { { b.top.left, b.middle.left, b.bottom.left },
+           { b.top.center, b.middle.center, b.bottom.center },
+           { b.top.right, b.middle.right, b.bottom.right } };
+}
+vector<Row> flay_diags(Board b) {
+  return { { b.top.left, b.middle.center, b.bottom.right },
+           { b.top.right, b.middle.center, b.bottom.left } };
+}
+// Returns Empty for a cats or a game that hasn't endend. Use `full` to check
+// for cats
+Space winner(Board b) {
+  vector<Row> f = flay(b);
+  Space win;
+  for(int i = 0; i < f.size(); i++) {
+    win = winner(f[i]);
+    if(win != Space::Empty) {
+      return win;
+    }
+  }
+  return Space::Empty;
+}
+
+Space winner(Row r) {
+  if(r.left == r.center && r.center == r.right) {
+    return r.left;
+  } else {
+    return Space::Empty;
+  }
+}
+
+bool is_game_over(Board b) {
+  return full(b) || winner(b) != Space::Empty;
+}
+Space next_turn(Space t) {
+  return static_cast<Space>((static_cast<int>(t) % 2) + 1);
 }

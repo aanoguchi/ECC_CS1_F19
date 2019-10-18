@@ -11,12 +11,12 @@
 using namespace std;
 
 /**
- * Data Definitions
+ * Data Definitions 
  **/
 
 enum class Player {One, Two};
 
-enum class Location {Tope
+enum class Location {Topfe
 
 enum class Space {Empty, X, O};
 struct Row {
